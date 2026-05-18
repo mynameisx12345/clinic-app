@@ -1,0 +1,50 @@
+<div class="flex-grow-1 p-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);min-height:100vh">
+  @if (patient) {
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 style="color:#1565c0">⚇ {{patient.first_name}} {{patient.last_name}}</h3>
+      <a [routerLink]="backRoute" class="btn btn-outline-secondary" style="border-radius:50px">← Back</a>
+    </div>
+    <div class="card shadow-sm border-0 p-4 mb-3">
+      <div class="row">
+        <div class="col-4"><strong>Gender:</strong> {{patient.gender}}</div>
+        <div class="col-4"><strong>Age:</strong> {{patient.age}}</div>
+        <div class="col-4"><strong>Birthday:</strong> {{patient.birthday}}</div>
+        <div class="col-4"><strong>Contact:</strong> {{patient.contact_number}}</div>
+        <div class="col-4"><strong>Email:</strong> {{patient.email}}</div>
+        <div class="col-4"><strong>Blood Type:</strong> {{patient.blood_type}}</div>
+        <div class="col-12"><strong>Allergies:</strong> {{patient.allergies}}</div>
+      </div>
+    </div>
+  }
+  <h5>Appointment History</h5>
+  <div class="card shadow-sm border-0 p-4 mb-3">
+    <div class="table-responsive"><table class="table bg-white">
+      <thead><tr><th>Date</th><th>Reason</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody>
+        @for (a of appointments; track a.id) {
+          <tr>
+            <td>{{a.appointment_date}}</td><td>{{a.reason_for_visit}}</td><td>{{a.status}}</td>
+            <td><button class="btn btn-sm btn-info" style="border-radius:50px" (click)="viewRecord(a)">View Record</button></td>
+          </tr>
+        }
+      </tbody>
+    </table></div>
+  </div>
+  @if (selectedRecord) {
+    <div class="card shadow-sm border-0 p-4 mb-3">
+      <h6>Medical Record</h6>
+      <p><strong>Signs/Symptoms:</strong> {{selectedRecord.signs_symptoms}}</p>
+      <p><strong>Diagnosis:</strong> {{selectedRecord.diagnosis}}</p>
+      <p><strong>Treatment:</strong> {{selectedRecord.treatment}}</p>
+      <p><strong>Prescriptions:</strong></p>
+      @if (parsePrescriptions(selectedRecord.prescriptions).length) {
+        <table class="table table-sm"><thead><tr><th>Medicine</th><th>Dosage</th><th>Frequency</th><th>Duration</th></tr></thead><tbody>
+          @for (rx of parsePrescriptions(selectedRecord.prescriptions); track $index) {
+            <tr><td>{{rx.medicine}}</td><td>{{rx.dosage}}</td><td>{{rx.frequency}}</td><td>{{rx.duration}}</td></tr>
+          }
+        </tbody></table>
+      }
+      <button class="btn btn-sm btn-outline-secondary" style="border-radius:50px" (click)="selectedRecord=null">Close</button>
+    </div>
+  }
+</div>

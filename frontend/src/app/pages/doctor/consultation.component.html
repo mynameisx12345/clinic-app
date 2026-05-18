@@ -1,0 +1,109 @@
+<div class="d-flex">
+  <nav class="sidebar p-3" style="width:220px">
+    <h5 class="text-white mb-4">⚕ Doctor Panel</h5>
+    <a routerLink="/doctor">Dashboard</a>
+    <a routerLink="/doctor/appointments">Appointments</a>
+    <a routerLink="/doctor/patients">Patients</a>
+      <hr class="border-secondary">
+        <a href="#" (click)="api.logout()">Logout</a>
+      </nav>
+  <div class="flex-grow-1 p-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);min-height:100vh">
+    <h3 class="mb-3" style="color:#1565c0">⚕ Consultation Hub</h3>
+
+    @if (patient) {
+      <div class="card shadow-sm border-0 p-4 mb-3">
+        <div class="row">
+          <div class="col-4"><strong>Patient:</strong> {{patient.first_name}} {{patient.last_name}}</div>
+          <div class="col-4"><strong>Gender:</strong> {{patient.gender}}</div>
+          <div class="col-4"><strong>Age:</strong> {{patient.age}}</div>
+          <div class="col-4"><strong>Contact:</strong> {{patient.contact_number}}</div>
+          <div class="col-4"><strong>Blood Type:</strong> {{patient.blood_type}}</div>
+          <div class="col-4"><strong>Allergies:</strong> {{patient.allergies}}</div>
+        </div>
+      </div>
+    }
+
+    @if (appointment) {
+      <div class="card shadow-sm border-0 p-4 mb-3">
+        <strong>Date:</strong> {{appointment.appointment_date}} | <strong>Time:</strong> {{appointment.time_slot}} | <strong>Reason:</strong> {{appointment.reason_for_visit}}
+      </div>
+    }
+
+    <div class="card shadow-sm border-0 p-4 mb-3">
+      <h5>Clinical Form</h5>
+      <div class="mb-2"><label class="form-label">Signs & Symptoms</label><textarea class="form-control" [(ngModel)]="form.signs_symptoms" name="ss" [readonly]="appointment?.status==='Completed'"></textarea></div>
+      <div class="mb-2"><label class="form-label">Diagnosis</label><textarea class="form-control" [(ngModel)]="form.diagnosis" name="dx" [readonly]="appointment?.status==='Completed'"></textarea></div>
+      <div class="mb-2"><label class="form-label">Treatment</label><textarea class="form-control" [(ngModel)]="form.treatment" name="tx" [readonly]="appointment?.status==='Completed'"></textarea></div>
+
+      <h6>Prescriptions</h6>
+      @for (p of form.prescriptions; track $index) {
+        <div class="row g-2 mb-2">
+          <div class="col-3 position-relative"><input class="form-control" placeholder="Medicine" [(ngModel)]="p.medicine" [attr.name]="'med'+$index" [readonly]="appointment?.status==='Completed'" (input)="searchMedicine(p, p.medicine)" (blur)="closeSuggestions(p)">
+            @if (p._suggestions?.length) {
+              <div class="position-absolute w-100 card shadow border-0 py-1" style="z-index:1050;max-height:150px;overflow-y:auto">
+                @for (m of p._suggestions; track m.id) {
+                  <button class="btn btn-link text-start text-dark text-decoration-none px-3 py-1 w-100 btn-sm" (click)="selectMedicine(p, m)">{{m.medicine_name}} {{m.strength}} ({{m.dosage_form}})</button>
+                }
+              </div>
+            }
+          </div>
+          <div class="col-3"><input class="form-control" placeholder="Dosage" [(ngModel)]="p.dosage" [attr.name]="'dos'+$index" [readonly]="appointment?.status==='Completed'"></div>
+          <div class="col-3"><input class="form-control" placeholder="Frequency" [(ngModel)]="p.frequency" [attr.name]="'frq'+$index" [readonly]="appointment?.status==='Completed'"></div>
+          <div class="col-2"><input class="form-control" placeholder="Duration" [(ngModel)]="p.duration" [attr.name]="'dur'+$index" [readonly]="appointment?.status==='Completed'"></div>
+          @if (appointment?.status!=='Completed') { <div class="col-1"><button class="btn btn-sm btn-danger" style="border-radius:50px" (click)="form.prescriptions.splice($index,1)">×</button></div> }
+        </div>
+      }
+      @if (appointment?.status!=='Completed') { <button class="btn btn-sm btn-outline-primary" style="border-radius:50px" (click)="form.prescriptions.push({medicine_id:null,medicine:'',dosage:'',frequency:'',duration:''})">+ Add Prescription</button> }
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-2">
+      <div class="d-flex gap-2">
+        @if (appointment?.status!=='Completed') {
+          <button class="btn btn-primary px-4" style="border-radius:50px" (click)="save()" [disabled]="!form.diagnosis">💾 Save</button>
+          <button class="btn btn-success px-4" style="border-radius:50px" (click)="showCompleteConfirm=true" [disabled]="!form.diagnosis">✓ Complete</button>
+        }
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-secondary px-3" style="border-radius:50px" (click)="showHistory=true">Patient History</button>
+        <a routerLink="/doctor/appointments" class="btn btn-outline-dark px-3" style="border-radius:50px">← Back</a>
+      </div>
+    </div>
+
+    @if (showHistory) {
+      <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,.5);z-index:1050" (click)="showHistory=false">
+        <div class="card shadow-sm border-0 p-4" style="width:700px;max-height:80vh;overflow:auto" (click)="$event.stopPropagation()">
+          <div class="d-flex justify-content-between mb-3"><h5>Appointment History</h5><button class="btn btn-sm btn-outline-secondary" style="border-radius:50px" (click)="showHistory=false">Close</button></div>
+          @if (history.length === 0) {
+            <p class="text-muted text-center py-3">No previous appointment history.</p>
+          } @else {
+          <div class="table-responsive"><table class="table table-sm">
+            <thead><tr><th>Date</th><th>Reason</th><th>Status</th><th>Diagnosis</th></tr></thead>
+            <tbody>
+              @for (h of history; track h.id) {
+                <tr><td>{{h.appointment_date}}</td><td>{{h.reason_for_visit}}</td><td>{{h.status}}</td><td>{{h.diagnosis || '-'}}</td></tr>
+              }
+            </tbody>
+          </table></div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (showCompleteConfirm) {
+    <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,.5);z-index:1060" (click)="showCompleteConfirm=false">
+      <div class="card shadow border-0 p-4 text-center" style="width:400px;border-radius:16px" (click)="$event.stopPropagation()">
+        <h5 class="fw-bold mb-2">Complete Appointment?</h5>
+        <p class="text-muted">Once completed, this record will become <strong>read-only</strong> and can no longer be edited.</p>
+        <div class="d-flex gap-2 justify-content-center mt-3">
+          <button class="btn btn-outline-secondary px-4" style="border-radius:50px" (click)="showCompleteConfirm=false">Cancel</button>
+          <button class="btn btn-success px-4" style="border-radius:50px" (click)="showCompleteConfirm=false;complete()">Yes, Complete</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  @if (snackbar) {
+    <div class="position-fixed bottom-0 start-50 translate-middle-x mb-4 px-4 py-3 rounded-pill shadow text-white" style="background:#323232;z-index:1100">{{snackbar}}</div>
+  }
+</div>

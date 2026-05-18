@@ -1,0 +1,59 @@
+<div class="d-flex">
+  <nav class="sidebar p-3" style="width:220px">
+    <h5 class="text-white mb-4">⚙ Admin Panel</h5>
+    <a routerLink="/staff">Dashboard</a>
+    <a routerLink="/staff/appointments">Appointments</a>
+    <a routerLink="/staff/availability">Doctor Availability</a>
+    <a routerLink="/staff/patients">Patient List</a>
+    <a routerLink="/staff/inventory">Inventory</a>
+    <a routerLink="/staff/register-user" class="active">Register User</a>
+      <hr class="border-secondary">
+        <a href="#" (click)="api.logout()">Logout</a>
+      </nav>
+  <div class="flex-grow-1 p-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);min-height:100vh">
+    <h3 class="mb-3" style="color:#1565c0">⊕ Register New User</h3>
+    @if (success) { <div class="alert alert-success">{{success}}</div> }
+    @if (error) { <div class="alert alert-danger">{{error}}</div> }
+    <div class="card shadow-sm border-0 p-4 mb-3">
+      <div class="row g-2">
+        <div class="col-md-4 mb-2"><label class="form-label">First Name</label><input class="form-control" [(ngModel)]="form.first_name" name="fn"></div>
+        <div class="col-md-4 mb-2"><label class="form-label">Middle Name</label><input class="form-control" [(ngModel)]="form.middle_name" name="mn"></div>
+        <div class="col-md-4 mb-2"><label class="form-label">Last Name</label><input class="form-control" [(ngModel)]="form.last_name" name="ln"></div>
+        <div class="col-md-4 mb-2"><label class="form-label">Contact Number</label><input class="form-control" [(ngModel)]="form.contact_number" name="cn"></div>
+        <div class="col-md-8 mb-2"><label class="form-label">Address</label><input class="form-control" [(ngModel)]="form.address" name="addr"></div>
+        <div class="col-md-4 mb-2"><label class="form-label">Username</label><input class="form-control" [(ngModel)]="form.username" name="un"></div>
+        <div class="col-md-4 mb-2"><label class="form-label">Password</label><div class="input-group"><input class="form-control" [type]="showPw ? 'text' : 'password'" [(ngModel)]="form.password" name="pw"><button class="btn btn-outline-secondary" type="button" (click)="showPw=!showPw">{{showPw ? '🙈' : '👁'}}</button></div></div>
+        <div class="col-md-4 mb-2">
+          <label class="form-label">Role</label>
+          <select class="form-select" [(ngModel)]="form.role" name="rl">
+            <option value="staff">Admin</option>
+            <option value="doctor">Doctor</option>
+            <option value="pharmacist">Pharmacist</option>
+            <option value="patient">Patient</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary mt-3" style="border-radius:50px" (click)="register()" [disabled]="!form.username || !form.password || !form.role || !form.first_name || !form.last_name">Register</button>
+    </div>
+
+    <h4 class="mb-3">All Registered Users</h4>
+    <div class="card shadow-sm border-0 p-4 mb-3">
+      <div class="table-responsive"><table class="table table-hover bg-white">
+        <thead><tr><th (click)="sort('username')">Username</th><th (click)="sort('first_name')">Name</th><th (click)="sort('role')">Role</th><th (click)="sort('contact_number')">Contact</th><th (click)="sort('address')">Address</th><th (click)="sort('created_at')">Created</th></tr></thead>
+        <tbody>
+          @for (u of pagedUsers; track u.id) {
+            <tr>
+              <td>{{u.username}}</td>
+              <td>{{u.first_name}} {{u.middle_name}} {{u.last_name}}</td>
+              <td><span class="badge bg-secondary">{{u.role}}</span></td>
+              <td>{{u.contact_number}}</td>
+              <td>{{u.address}}</td>
+              <td>{{u.created_at}}</td>
+            </tr>
+          }
+        </tbody>
+      </table></div>
+      <div class="d-flex flex-wrap justify-content-between align-items-center mt-3"><div class="d-flex align-items-center gap-2"><small class="text-muted">Rows per page:</small><select class="form-select form-select-sm" style="width:auto" [ngModel]="pageSize" (ngModelChange)="pageSize=$event;page=1" name="ps"><option [value]="10">10</option><option [value]="20">20</option><option [value]="50">50</option><option [value]="100">100</option></select></div><div class="d-flex align-items-center gap-2"><small class="text-muted">{{(page-1)*pageSize+1}}–{{page*pageSize > totalItems ? totalItems : page*pageSize}} of {{totalItems}}</small><button class="btn btn-sm btn-outline-secondary" [disabled]="page===1" (click)="page=page-1">‹</button><button class="btn btn-sm btn-outline-secondary" [disabled]="page*pageSize>=totalItems" (click)="page=page+1">›</button></div></div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,45 @@
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f7fa; }
+.card { border: none; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+.metric-card { cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.metric-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.12) !important; }
+.metric-card.active { border: 2px solid #0d6efd; }
+.modal-backdrop { background: rgba(0,0,0,.5); }
+.sidebar { min-height: 100vh; background: #1e293b; color: #fff; }
+.sidebar a { color: #cbd5e1; text-decoration: none; padding: .5rem 1rem; display: block; }
+.sidebar a:hover, .sidebar a.active { background: #334155; color: #fff; }
+.table th { cursor: pointer; user-select: none; }
+.badge-good { background: #22c55e; }
+.badge-low { background: #f59e0b; }
+.badge-critical { background: #ef4444; }
+.badge-expired { background: #dc2626; }
+.badge-expiring { background: #f97316; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .d-flex:has(> .sidebar) { flex-direction: column; }
+  .sidebar { min-height: auto; width: 100% !important; padding: .75rem !important; position: relative; }
+  .sidebar h5 { margin-bottom: 0 !important; cursor: pointer; }
+  .sidebar h5::after { content: ' ☰'; font-size: .8rem; }
+  .sidebar a, .sidebar hr { display: none; }
+  .sidebar.menu-open h5 { margin-bottom: .5rem !important; }
+  .sidebar.menu-open h5::after { content: ' ✕'; }
+  .sidebar.menu-open a { display: block; padding: .4rem .75rem; font-size: .85rem; }
+  .sidebar.menu-open hr { display: block; margin: .25rem 0; }
+  .table { font-size: .8rem; }
+  .table th, .table td { padding: .4rem; }
+  .card p, .card small { font-size: .85rem; }
+  .row.g-3 > [class*="col-md"] { flex: 0 0 50%; max-width: 50%; }
+}
+
+/* Password toggle */
+.input-group .btn-outline-secondary { border-color: #dee2e6; }
+
+/* Table wrapper for horizontal scroll on mobile */
+.table-responsive-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+/* Modal responsive */
+@media (max-width: 576px) {
+  .position-fixed .card { width: 95vw !important; max-height: 90vh; overflow-y: auto; margin: 1rem; }
+}
+
+@keyframes fadeIn { from { opacity:0; transform:translateX(-50%) translateY(10px); } to { opacity:1; transform:translateX(-50%) translateY(0); } }

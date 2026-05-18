@@ -1,0 +1,79 @@
+<div class="min-vh-100" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);">
+  <div class="container py-5" style="max-width:700px">
+    <div class="text-center mb-4">
+      <span style="font-size:2.5rem">📅</span>
+      <h2 class="fw-bold mt-2" style="color:#1565c0">Book an Appointment</h2>
+      <p class="text-muted">Schedule your visit in just a few steps</p>
+    </div>
+
+    <!-- Stepper -->
+    <div class="d-flex align-items-center mb-4 px-3">
+      <div class="d-flex align-items-center">
+        <span class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" [class.bg-primary]="step>=1" [class.bg-secondary]="step<1" style="width:36px;height:36px;color:#fff;font-weight:bold">1</span>
+        <span class="ms-2 fw-semibold" [class.text-primary]="step>=1">Date & Time</span>
+      </div>
+      <div class="flex-grow-1 mx-3 rounded" style="height:3px" [class.bg-primary]="step>=2" [class.bg-secondary]="step<2"></div>
+      <div class="d-flex align-items-center">
+        <span class="rounded-circle d-flex align-items-center justify-content-center shadow-sm" [class.bg-primary]="step>=2" [class.bg-secondary]="step<2" style="width:36px;height:36px;color:#fff;font-weight:bold">2</span>
+        <span class="ms-2 fw-semibold" [class.text-primary]="step>=2" [class.text-muted]="step<2">Patient Info</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Date & Time -->
+    @if (step === 1) {
+      <div class="card shadow-sm border-0 p-4">
+        <h5 class="fw-semibold mb-3">Select a Date</h5>
+        <div class="row g-2 mb-4">
+          @for (slot of availability; track slot.id) {
+            <div class="col-4 col-md-3">
+              <button class="btn w-100 shadow-sm" style="border-radius:12px" [class.btn-primary]="selectedDate===slot.available_date" [class.btn-outline-primary]="selectedDate!==slot.available_date" (click)="selectDate(slot)">{{slot.available_date}}</button>
+            </div>
+          }
+        </div>
+        @if (selectedDate) {
+          <h5 class="fw-semibold mb-3">Select a Time</h5>
+          <div class="d-flex flex-wrap gap-2 mb-4">
+            @for (t of selectedSlots; track t) {
+              <button class="btn" style="border-radius:20px" [class.btn-success]="selectedTime===t" [class.btn-outline-secondary]="selectedTime!==t" (click)="selectedTime=t">{{t}}</button>
+            }
+          </div>
+        }
+        <div class="d-flex justify-content-between mt-3">
+          <a [routerLink]="cancelRoute" class="btn btn-link text-muted">← Cancel</a>
+          <button class="btn btn-primary px-4" style="border-radius:50px" [disabled]="!selectedTime" (click)="step=2">Next →</button>
+        </div>
+      </div>
+    }
+
+    <!-- Step 2: Patient Info -->
+    @if (step === 2) {
+      <div class="card shadow-sm border-0 p-4">
+        <h5 class="fw-semibold mb-3">Patient Information</h5>
+        <div class="mb-3">
+          <label class="form-label d-block text-muted">Visit Type</label>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="radio" [(ngModel)]="visitType" value="new" name="vt"><label class="form-check-label">New Patient</label></div>
+          <div class="form-check form-check-inline"><input class="form-check-input" type="radio" [(ngModel)]="visitType" value="followup" name="vt"><label class="form-check-label">Follow-Up</label></div>
+        </div>
+        <div class="row g-2">
+          <div class="col-6 mb-2"><label class="form-label">First Name</label><input class="form-control" [(ngModel)]="form.first_name" name="fn"></div>
+          <div class="col-6 mb-2"><label class="form-label">Last Name</label><input class="form-control" [(ngModel)]="form.last_name" name="ln"></div>
+          <div class="col-6 mb-2"><label class="form-label">Middle Name</label><input class="form-control" [(ngModel)]="form.middle_name" name="mn"></div>
+          <div class="col-6 mb-2"><label class="form-label">Birthday</label><input class="form-control" type="date" [(ngModel)]="form.birthday" name="bd" (change)="calcAge()"></div>
+          <div class="col-4 mb-2"><label class="form-label">Age</label><input class="form-control" [value]="form.age ?? ''" readonly></div>
+          <div class="col-4 mb-2"><label class="form-label">Gender</label><select class="form-select" [(ngModel)]="form.gender" name="g"><option value="Male">Male</option><option value="Female">Female</option></select></div>
+          <div class="col-4 mb-2"><label class="form-label">Civil Status</label><select class="form-select" [(ngModel)]="form.civil_status" name="cs"><option>Single</option><option>Married</option><option>Widow</option><option>Widower</option><option>Separated</option><option>Divorced</option></select></div>
+          <div class="col-6 mb-2"><label class="form-label">Contact</label><input class="form-control" [(ngModel)]="form.contact_number" name="cn"></div>
+          <div class="col-6 mb-2"><label class="form-label">Email</label><input class="form-control" [(ngModel)]="form.email" name="em"></div>
+          <div class="col-6 mb-2"><label class="form-label">Blood Type</label><input class="form-control" [(ngModel)]="form.blood_type" name="bt"></div>
+          <div class="col-6 mb-2"><label class="form-label">Allergies</label><input class="form-control" [(ngModel)]="form.allergies" name="al"></div>
+          <div class="col-12 mb-2"><label class="form-label">Address</label><input class="form-control" [(ngModel)]="form.address" name="addr"></div>
+          <div class="col-12 mb-2"><label class="form-label">Reason for Visit</label><textarea class="form-control" rows="3" [(ngModel)]="form.reason" name="rv"></textarea></div>
+        </div>
+        <div class="d-flex justify-content-between mt-4">
+          <button class="btn btn-outline-secondary px-4" style="border-radius:50px" (click)="step=1">← Back</button>
+          <button class="btn btn-primary px-4" style="border-radius:50px" (click)="submit()" [disabled]="!form.first_name || !form.last_name || !form.birthday || !form.gender || !form.civil_status || !form.contact_number || !form.blood_type || !form.allergies || !form.address || !form.reason">Submit Appointment</button>
+        </div>
+      </div>
+    }
+  </div>
+</div>

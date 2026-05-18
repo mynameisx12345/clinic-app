@@ -1,0 +1,26 @@
+<div class="min-vh-100 d-flex flex-column">
+  <div class="flex-grow-1 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);">
+    <div class="text-center p-4" style="max-width:600px">
+      <div class="mb-4">
+        <span style="font-size:4rem">🏥</span>
+      </div>
+      <h1 class="fw-bold mb-2" style="color:#1565c0;font-size:2.2rem">Ballogdajan Medical Clinic</h1>
+      <p class="text-muted mb-4" style="font-size:1.1rem">Your trusted partner in quality healthcare.<br>Book your appointment today — fast, easy, and convenient.</p>
+      <div class="d-flex flex-column align-items-center gap-3">
+        <a routerLink="/book" class="btn btn-primary btn-lg px-5 shadow-sm" style="border-radius:50px">Book an Appointment</a>
+        @if (!api.isLoggedIn) {
+          <a routerLink="/login" class="btn btn-outline-secondary px-4" style="border-radius:50px">Login to your Account</a>
+        }
+        @if (api.isLoggedIn) {
+          <div class="d-flex gap-2 mt-2">
+            <a [routerLink]="'/' + api.user.role" class="btn btn-success px-4" style="border-radius:50px">Go to Dashboard</a>
+            <button class="btn btn-outline-danger px-3" style="border-radius:50px" (click)="api.logout()">Logout</button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+  <footer class="text-center py-3 text-muted small" style="background:#fff">
+    © 2026 Ballogdajan Medical Clinic. All rights reserved.
+  </footer>
+</div>

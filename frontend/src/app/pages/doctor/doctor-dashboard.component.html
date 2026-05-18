@@ -1,0 +1,18 @@
+<div class="d-flex">
+  <nav class="sidebar p-3" style="width:220px">
+    <h5 class="text-white mb-4">⚕ Doctor Panel</h5>
+    <a routerLink="/doctor">Dashboard</a>
+    <a routerLink="/doctor/appointments">Appointments</a>
+    <a routerLink="/doctor/patients">Patients</a>
+    <hr class="border-secondary">
+    <a href="#" (click)="api.logout()">Logout</a>
+  </nav>
+  <div class="flex-grow-1 p-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);min-height:100vh">
+    <h3 class="mb-3" style="color:#1565c0">⊞ Doctor Dashboard</h3>
+    <div class="row g-3">
+      <div class="col-md-4"><div class="card shadow-sm border-0 metric-card p-4 mb-3 text-center" style="border-left:4px solid #f59e0b !important"><h4>{{metrics.forConfirmation}}</h4><small>⟐ For Confirmation</small></div></div>
+      <div class="col-md-4"><div class="card shadow-sm border-0 metric-card p-4 mb-3 text-center" style="border-left:4px solid #0d6efd !important"><h4>{{metrics.todayAppts}}</h4><small>☷ Today's Appointments</small></div></div>
+      <div class="col-md-4"><div class="card shadow-sm border-0 metric-card p-4 mb-3 text-center" style="border-left:4px solid #06b6d4 !important"><h4>{{metrics.totalPatients}}</h4><small>⊞ Total Patients</small></div></div>
+    </div>
+  </div>
+</div>
