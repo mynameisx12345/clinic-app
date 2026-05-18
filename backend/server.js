@@ -19,5 +19,5 @@ app.use(express.static(path.join(__dirname, '../frontend/dist/clinic-frontend/br
 app.get('*', (req, res) => res.sendFile(path.join(__dirname, '../frontend/dist/clinic-frontend/browser/index.html')));
 
 const PORT = 3000;
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.HOST || '0.0.0.0';
 app.listen(PORT, HOST, () => console.log(`Clinic API running on http://${HOST}:${PORT}`));

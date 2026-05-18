@@ -6,7 +6,7 @@
     "start:network": "lsof -ti:3000 | xargs kill -9 2>/dev/null; HOST=0.0.0.0 node server.js",
     "serve": "cd ../frontend && npm run build && cd ../backend && lsof -ti:3000 | xargs kill -9 2>/dev/null; HOST=0.0.0.0 node server.js",
     "serve:win": "cd ../frontend && npm run build && cd ../backend && set HOST=0.0.0.0&& node server.js",
-    "serve:all": "cd ../frontend && npm run build && cd ../backend && HOST=0.0.0.0 node server.js",
+    "serve:all": "cd ../frontend && npm run build && cd ../backend && node server.js",
     "seed": "node seed.js"
   },
   "dependencies": {
