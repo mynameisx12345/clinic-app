@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { PharmaNotifBellComponent } from '../../shared/pharma-notif-bell.component';
 
 @Component({
   selector: 'app-pharmacist-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PharmaNotifBellComponent],
   templateUrl: './pharmacist-reports.component.html',
   styleUrl: './pharmacist-reports.component.scss'
 })
@@ -35,4 +36,23 @@ export class PharmacistReportsComponent implements OnInit {
 
   constructor(public api: ApiService) {}
   ngOnInit() { this.api.getStockLedger().subscribe(d => this.ledger = d); }
+
+  printing = false;
+  get printDate() { return new Date().toLocaleDateString(); }
+
+  printTable() {
+    this.printing = true;
+    setTimeout(() => { window.print(); this.printing = false; });
+  }
+
+  exportCsv() {
+    const rows = this.filtered;
+    const header = 'Date,Medicine,Type,Quantity,Price/Unit,Total';
+    const csv = [header, ...rows.map(t => `${t.transaction_date},"${t.medicine_name}",${t.transaction_type},${t.quantity},${t.price_per_unit},${t.total_price}`)].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const el = document.createElement('a');
+    el.href = url; el.download = 'stock-ledger.csv'; el.click();
+    URL.revokeObjectURL(url);
+  }
 }

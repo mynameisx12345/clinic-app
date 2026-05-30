@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { NotifBellComponent } from '../../shared/notif-bell.component';
 
 @Component({
   selector: 'app-doctor-patients',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, NotifBellComponent],
   templateUrl: './doctor-patients.component.html',
   styleUrl: './doctor-patients.component.scss'
 })
@@ -31,4 +32,23 @@ export class DoctorPatientsComponent implements OnInit {
   sort(col: string) { this.sortDir = this.sortCol === col ? -this.sortDir : 1; this.sortCol = col; }
   constructor(public api: ApiService) {}
   ngOnInit() { this.api.getDoctorPatients(this.api.user.id).subscribe(d => this.patients = d); }
+
+  printing = false;
+  get printDate() { return new Date().toLocaleDateString(); }
+
+  printTable() {
+    this.printing = true;
+    setTimeout(() => { window.print(); this.printing = false; });
+  }
+
+  exportCsv() {
+    const rows = this.filtered;
+    const header = 'Name,Gender,Age,Contact';
+    const csv = [header, ...rows.map(p => `"${p.first_name} ${p.last_name}",${p.gender},${p.age},${p.contact_number}`)].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const el = document.createElement('a');
+    el.href = url; el.download = 'patients.csv'; el.click();
+    URL.revokeObjectURL(url);
+  }
 }

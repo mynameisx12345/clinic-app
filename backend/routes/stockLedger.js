@@ -23,6 +23,16 @@ router.post('/', authMiddleware, roleGuard('pharmacist', 'staff'), (req, res) =>
   if (transaction_type === 'Adjust') {
     db.prepare('UPDATE medicine_inventory SET quantity = quantity + ? WHERE id=?').run(quantity, medicine_id);
   }
+
+  // Check if medicine is now low stock
+  const med = db.prepare('SELECT * FROM medicine_inventory WHERE id=?').get(medicine_id);
+  if (med && med.quantity <= 20) {
+    const broadcast = req.app.get('broadcast');
+    if (broadcast) {
+      broadcast({ type: 'low_stock', data: { id: med.id, medicine_name: med.medicine_name, quantity: med.quantity } });
+    }
+  }
+
   res.json({ message: 'Transaction recorded' });
 });
 

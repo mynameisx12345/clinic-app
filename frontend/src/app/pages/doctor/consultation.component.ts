@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { NotifBellComponent } from '../../shared/notif-bell.component';
 
 @Component({
   selector: 'app-consultation',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, NotifBellComponent],
   templateUrl: './consultation.component.html',
   styleUrl: './consultation.component.scss'
 })

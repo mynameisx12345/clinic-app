@@ -1,66 +1,74 @@
-<div class="d-flex">
-  <nav class="sidebar p-3" style="width:220px">
-    <h5 class="text-white mb-4">⚙ Admin Panel</h5>
-    <a routerLink="/staff">Dashboard</a>
-    <a routerLink="/staff/appointments">Appointments</a>
-    <a routerLink="/staff/availability">Doctor Availability</a>
-    <a routerLink="/staff/patients">Patient List</a>
-    <a routerLink="/staff/inventory" class="active">Inventory</a>
-        <a routerLink="/staff/register-user">Register User</a>
-      <hr class="border-secondary">
-        <a href="#" (click)="api.logout()">Logout</a>
-      </nav>
-  <div class="flex-grow-1 p-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);min-height:100vh">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h3 style="color:#1565c0">⚕ Medicine Inventory</h3>
-      <button class="btn btn-success" style="border-radius:50px" (click)="showAdd=true">+ Add Medicine</button>
+<div class="admin-layout">
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <img src="assets/1000054328.webp" alt="Logo">
+      <span>Ballogdajan Medical Clinic</span>
     </div>
-    <div class="card shadow-sm border-0 p-4 mb-3">
-      <div class="d-flex flex-wrap gap-2 mb-3">
-        <input class="form-control form-control-sm" style="max-width:250px" placeholder="Search medicine..." [(ngModel)]="search" (ngModelChange)="page=1" name="search">
-        <button class="btn btn-sm" [style.background]="statusFilter==='Good'?'#22c55e':'transparent'" [style.border]="'1px solid #22c55e'" [style.color]="statusFilter==='Good'?'white':'#22c55e'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Good'?'':'Good';page=1">Good</button>
-        <button class="btn btn-sm" [style.background]="statusFilter==='Low Stock'?'#f59e0b':'transparent'" [style.border]="'1px solid #f59e0b'" [style.color]="statusFilter==='Low Stock'?'white':'#f59e0b'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Low Stock'?'':'Low Stock';page=1">Low Stock</button>
-        <button class="btn btn-sm" [style.background]="statusFilter==='Critical'?'#ef4444':'transparent'" [style.border]="'1px solid #ef4444'" [style.color]="statusFilter==='Critical'?'white':'#ef4444'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Critical'?'':'Critical';page=1">Critical</button>
-        <button class="btn btn-sm" [style.background]="statusFilter==='Expiring Soon'?'#f97316':'transparent'" [style.border]="'1px solid #f97316'" [style.color]="statusFilter==='Expiring Soon'?'white':'#f97316'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Expiring Soon'?'':'Expiring Soon';page=1">Expiring Soon</button>
-        <button class="btn btn-sm" [style.background]="statusFilter==='Expired'?'#dc2626':'transparent'" [style.border]="'1px solid #dc2626'" [style.color]="statusFilter==='Expired'?'white':'#dc2626'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Expired'?'':'Expired';page=1">Expired</button>
-      </div>
-      <div class="table-responsive"><table class="table table-hover bg-white">
-        <thead><tr><th (click)="sort('medicine_name')">Name</th><th (click)="sort('category')">Category</th><th (click)="sort('batch_number')">Batch</th><th (click)="sort('dosage_form')">Form</th><th (click)="sort('strength')">Strength</th><th (click)="sort('unit')">Unit</th><th (click)="sort('quantity')">Qty</th><th (click)="sort('unit_price')">Price</th><th (click)="sort('expiration_date')">Expiry Date</th><th>Status</th></tr></thead>
-        <tbody>
-          @for (m of paged; track m.id) {
-            <tr>
-              <td>{{m.medicine_name}}</td><td>{{m.category}}</td><td>{{m.batch_number}}</td>
-              <td>{{m.dosage_form}}</td><td>{{m.strength}}</td><td>{{m.unit}}</td><td>{{m.quantity}}</td><td>₱{{m.unit_price}}</td><td>{{m.expiration_date}}</td>
-              <td>
-                <span class="badge" [class.badge-good]="qtyStatus(m)==='Good'" [class.badge-low]="qtyStatus(m)==='Low Stock'" [class.badge-critical]="qtyStatus(m)==='Critical'">{{qtyStatus(m)}}</span>
-                <span class="badge ms-1" [class.badge-good]="expStatus(m)==='Good'" [class.badge-expiring]="expStatus(m)==='Expiring Soon'" [class.badge-expired]="expStatus(m)==='Expired'">{{expStatus(m)}}</span>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table></div>
-      <div class="d-flex flex-wrap justify-content-between align-items-center mt-3"><div class="d-flex align-items-center gap-2"><small class="text-muted">Rows per page:</small><select class="form-select form-select-sm" style="width:auto" [ngModel]="pageSize" (ngModelChange)="pageSize=$event;page=1" name="ps"><option [value]="10">10</option><option [value]="20">20</option><option [value]="50">50</option><option [value]="100">100</option></select></div><div class="d-flex align-items-center gap-2"><small class="text-muted">{{(page-1)*pageSize+1}}–{{page*pageSize > totalItems ? totalItems : page*pageSize}} of {{totalItems}}</small><button class="btn btn-sm btn-outline-secondary" [disabled]="page===1" (click)="page=page-1">‹</button><button class="btn btn-sm btn-outline-secondary" [disabled]="page*pageSize>=totalItems" (click)="page=page+1">›</button></div></div>
-    </div>
-
-    <!-- Add Medicine Modal -->
-    @if (showAdd) {
-      <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,.5);z-index:1050">
-        <div class="card p-4" style="width:500px">
-          <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Add New Medicine</h5><button class="btn btn-sm btn-outline-secondary" style="border-radius:50px" (click)="showAdd=false">✕ Close</button></div>
-          <div class="row g-2">
-            <div class="col-6"><input class="form-control" placeholder="Medicine Name" [(ngModel)]="newMed.medicine_name" name="mn"></div>
-            <div class="col-6"><input class="form-control" placeholder="Category" [(ngModel)]="newMed.category" name="cat"></div>
-            <div class="col-6"><input class="form-control" placeholder="Batch Number" [(ngModel)]="newMed.batch_number" name="bn"></div>
-            <div class="col-6"><input class="form-control" placeholder="Dosage Form" [(ngModel)]="newMed.dosage_form" name="df"></div>
-            <div class="col-4"><input class="form-control" placeholder="Strength" [(ngModel)]="newMed.strength" name="str"></div>
-            <div class="col-4"><input class="form-control" placeholder="Unit" [(ngModel)]="newMed.unit" name="un"></div>
-            <div class="col-4"><input class="form-control" type="number" placeholder="Quantity" [(ngModel)]="newMed.quantity" name="qty"></div>
-            <div class="col-6"><input class="form-control" type="number" placeholder="Unit Price" [(ngModel)]="newMed.unit_price" name="up"></div>
-            <div class="col-6"><input class="form-control" type="date" placeholder="Expiration" [(ngModel)]="newMed.expiration_date" name="exp"></div>
-          </div>
-          <button class="btn btn-primary mt-3" style="border-radius:50px" (click)="addMedicine()" [disabled]="!newMed.medicine_name || !newMed.category || !newMed.batch_number || !newMed.dosage_form || !newMed.strength || !newMed.unit || !newMed.quantity || !newMed.unit_price || !newMed.expiration_date">Save</button>
+    <a routerLink="/staff">⊞ Dashboard</a>
+    <a routerLink="/staff/appointments">📋 Appointments</a>
+    <a routerLink="/staff/availability">⏲ Availability</a>
+    <a routerLink="/staff/patients">👥 Patients</a>
+    <a routerLink="/staff/register-user">⊕ Register User</a>
+  </nav>
+  <div class="admin-main">
+    <header class="admin-header">
+      <h4>Medicine Inventory</h4>
+      <div class="admin-header-actions">
+        <button class="btn btn-success btn-sm" style="border-radius:50px" (click)="showAdd=true">+ Add Medicine</button>
+        <app-notif-bell></app-notif-bell>
+        <div class="user-info">
+          <span>{{api.user?.username}}</span>
+          <button class="btn-logout-sm" (click)="api.logout()">Logout</button>
         </div>
       </div>
-    }
+    </header>
+    <div class="admin-content">
+      <div class="card shadow-sm border-0 p-4 mb-3">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <input class="form-control form-control-sm" style="max-width:250px" placeholder="Search medicine..." [(ngModel)]="search" (ngModelChange)="page=1" name="search">
+          <button class="btn btn-sm" [style.background]="statusFilter==='Good'?'#22c55e':'transparent'" [style.border]="'1px solid #22c55e'" [style.color]="statusFilter==='Good'?'white':'#22c55e'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Good'?'':'Good';page=1">Good</button>
+          <button class="btn btn-sm" [style.background]="statusFilter==='Low Stock'?'#f59e0b':'transparent'" [style.border]="'1px solid #f59e0b'" [style.color]="statusFilter==='Low Stock'?'white':'#f59e0b'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Low Stock'?'':'Low Stock';page=1">Low Stock</button>
+          <button class="btn btn-sm" [style.background]="statusFilter==='Critical'?'#ef4444':'transparent'" [style.border]="'1px solid #ef4444'" [style.color]="statusFilter==='Critical'?'white':'#ef4444'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Critical'?'':'Critical';page=1">Critical</button>
+          <button class="btn btn-sm" [style.background]="statusFilter==='Expiring Soon'?'#f97316':'transparent'" [style.border]="'1px solid #f97316'" [style.color]="statusFilter==='Expiring Soon'?'white':'#f97316'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Expiring Soon'?'':'Expiring Soon';page=1">Expiring Soon</button>
+          <button class="btn btn-sm" [style.background]="statusFilter==='Expired'?'#dc2626':'transparent'" [style.border]="'1px solid #dc2626'" [style.color]="statusFilter==='Expired'?'white':'#dc2626'" style="border-radius:50px" (click)="statusFilter=statusFilter==='Expired'?'':'Expired';page=1">Expired</button>
+        </div>
+        <div class="table-responsive"><table class="table table-hover bg-white">
+          <thead><tr><th (click)="sort('medicine_name')">Name</th><th (click)="sort('category')">Category</th><th (click)="sort('batch_number')">Batch</th><th (click)="sort('dosage_form')">Form</th><th (click)="sort('strength')">Strength</th><th (click)="sort('unit')">Unit</th><th (click)="sort('quantity')">Qty</th><th (click)="sort('unit_price')">Price</th><th (click)="sort('expiration_date')">Expiry Date</th><th>Status</th></tr></thead>
+          <tbody>
+            @for (m of paged; track m.id) {
+              <tr>
+                <td>{{m.medicine_name}}</td><td>{{m.category}}</td><td>{{m.batch_number}}</td>
+                <td>{{m.dosage_form}}</td><td>{{m.strength}}</td><td>{{m.unit}}</td><td>{{m.quantity}}</td><td>₱{{m.unit_price}}</td><td>{{m.expiration_date}}</td>
+                <td>
+                  <span class="badge" [class.badge-good]="qtyStatus(m)==='Good'" [class.badge-low]="qtyStatus(m)==='Low Stock'" [class.badge-critical]="qtyStatus(m)==='Critical'">{{qtyStatus(m)}}</span>
+                  <span class="badge ms-1" [class.badge-good]="expStatus(m)==='Good'" [class.badge-expiring]="expStatus(m)==='Expiring Soon'" [class.badge-expired]="expStatus(m)==='Expired'">{{expStatus(m)}}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table></div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center mt-3"><div class="d-flex align-items-center gap-2"><small class="text-muted">Rows per page:</small><select class="form-select form-select-sm" style="width:auto" [ngModel]="pageSize" (ngModelChange)="pageSize=$event;page=1" name="ps"><option [value]="10">10</option><option [value]="20">20</option><option [value]="50">50</option><option [value]="100">100</option></select></div><div class="d-flex align-items-center gap-2"><small class="text-muted">{{(page-1)*pageSize+1}}–{{page*pageSize > totalItems ? totalItems : page*pageSize}} of {{totalItems}}</small><button class="btn btn-sm btn-outline-secondary" [disabled]="page===1" (click)="page=page-1">‹</button><button class="btn btn-sm btn-outline-secondary" [disabled]="page*pageSize>=totalItems" (click)="page=page+1">›</button></div></div>
+      </div>
+
+      @if (showAdd) {
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="background:rgba(0,0,0,.5);z-index:1050">
+          <div class="card p-4" style="width:500px">
+            <div class="d-flex justify-content-between align-items-center mb-3"><h5 class="mb-0">Add New Medicine</h5><button class="btn btn-sm btn-outline-secondary" style="border-radius:50px" (click)="showAdd=false">✕ Close</button></div>
+            <div class="row g-2">
+              <div class="col-6"><input class="form-control" placeholder="Medicine Name" [(ngModel)]="newMed.medicine_name" name="mn"></div>
+              <div class="col-6"><input class="form-control" placeholder="Category" [(ngModel)]="newMed.category" name="cat"></div>
+              <div class="col-6"><input class="form-control" placeholder="Batch Number" [(ngModel)]="newMed.batch_number" name="bn"></div>
+              <div class="col-6"><input class="form-control" placeholder="Dosage Form" [(ngModel)]="newMed.dosage_form" name="df"></div>
+              <div class="col-4"><input class="form-control" placeholder="Strength" [(ngModel)]="newMed.strength" name="str"></div>
+              <div class="col-4"><input class="form-control" placeholder="Unit" [(ngModel)]="newMed.unit" name="un"></div>
+              <div class="col-4"><input class="form-control" type="number" placeholder="Quantity" [(ngModel)]="newMed.quantity" name="qty"></div>
+              <div class="col-6"><input class="form-control" type="number" placeholder="Unit Price" [(ngModel)]="newMed.unit_price" name="up"></div>
+              <div class="col-6"><input class="form-control" type="date" placeholder="Expiration" [(ngModel)]="newMed.expiration_date" name="exp"></div>
+            </div>
+            <button class="btn btn-primary mt-3" style="border-radius:50px" (click)="addMedicine()" [disabled]="!newMed.medicine_name || !newMed.category || !newMed.batch_number || !newMed.dosage_form || !newMed.strength || !newMed.unit || !newMed.quantity || !newMed.unit_price || !newMed.expiration_date">Save</button>
+          </div>
+        </div>
+      }
+    </div>
   </div>
 </div>

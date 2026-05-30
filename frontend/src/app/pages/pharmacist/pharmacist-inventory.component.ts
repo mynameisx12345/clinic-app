@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { PharmaNotifBellComponent } from '../../shared/pharma-notif-bell.component';
 
 @Component({
   selector: 'app-pharmacist-inventory',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PharmaNotifBellComponent],
   templateUrl: './pharmacist-inventory.component.html',
   styleUrl: './pharmacist-inventory.component.scss'
 })
@@ -16,7 +17,7 @@ export class PharmacistInventoryComponent implements OnInit {
   showAdd = false;
   showStock = false;
   newMed: any = {};
-  txn: any = { medicine_id: '', transaction_type: 'Sales', quantity: 0, price_per_unit: 0, total_price: 0, transaction_date: new Date().toISOString().split('T')[0], remarks: '' };
+  txn: any = { medicine_id: '', transaction_type: 'Sales', quantity: 0, price_per_unit: 0, total_price: 0, transaction_date: '', remarks: '' };
   page=1; pageSize=10;
   sortCol=''; sortDir=1;
   search=''; statusFilter='';
@@ -52,6 +53,7 @@ export class PharmacistInventoryComponent implements OnInit {
   }
 
   calcTotal() { this.txn.total_price = (this.txn.quantity || 0) * (this.txn.price_per_unit || 0); }
+  today() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; }
 
   onMedicineChange() {
     const med = this.inventory.find(m => m.id === +this.txn.medicine_id);
@@ -63,6 +65,25 @@ export class PharmacistInventoryComponent implements OnInit {
   }
 
   submitTransaction() {
-    this.api.addStockTransaction({ ...this.txn, medicine_id: +this.txn.medicine_id }).subscribe(() => { this.showStock = false; this.txn = { medicine_id: '', transaction_type: 'Sales', quantity: 0, price_per_unit: 0, total_price: 0, transaction_date: new Date().toISOString().split('T')[0], remarks: '' }; this.load(); });
+    this.api.addStockTransaction({ ...this.txn, medicine_id: +this.txn.medicine_id }).subscribe(() => { this.showStock = false; this.txn = { medicine_id: '', transaction_type: 'Sales', quantity: 0, price_per_unit: 0, total_price: 0, transaction_date: this.today(), remarks: '' }; this.load(); });
+  }
+
+  printing = false;
+  get printDate() { return new Date().toLocaleDateString(); }
+
+  printTable() {
+    this.printing = true;
+    setTimeout(() => { window.print(); this.printing = false; });
+  }
+
+  exportCsv() {
+    const rows = this.filtered;
+    const header = 'Name,Category,Batch,Form,Strength,Unit,Quantity,Price,Expiry Date';
+    const csv = [header, ...rows.map(m => `"${m.medicine_name}","${m.category}",${m.batch_number},${m.dosage_form},${m.strength},${m.unit},${m.quantity},${m.unit_price},${m.expiration_date}`)].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const el = document.createElement('a');
+    el.href = url; el.download = 'inventory.csv'; el.click();
+    URL.revokeObjectURL(url);
   }
 }

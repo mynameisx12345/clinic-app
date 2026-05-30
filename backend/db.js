@@ -93,10 +93,29 @@ CREATE TABLE IF NOT EXISTS doctor_availability (
   doctor_id INTEGER NOT NULL,
   available_date TEXT NOT NULL,
   time_slots TEXT NOT NULL,
+  morning_start TEXT,
+  morning_end TEXT,
+  morning_max INTEGER DEFAULT 0,
+  afternoon_start TEXT,
+  afternoon_end TEXT,
+  afternoon_max INTEGER DEFAULT 0,
   FOREIGN KEY(doctor_id) REFERENCES users(id)
 );
+
+CREATE TABLE IF NOT EXISTS settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL
+);
+
+INSERT OR IGNORE INTO settings (key, value) VALUES ('system_expiry_date', '2026-06-30');
 `);
 
 try { db.prepare("ALTER TABLE stock_ledger ADD COLUMN remarks TEXT DEFAULT ''").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE doctor_availability ADD COLUMN morning_start TEXT").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE doctor_availability ADD COLUMN morning_end TEXT").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE doctor_availability ADD COLUMN morning_max INTEGER DEFAULT 0").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE doctor_availability ADD COLUMN afternoon_start TEXT").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE doctor_availability ADD COLUMN afternoon_end TEXT").run(); } catch(e) {}
+try { db.prepare("ALTER TABLE doctor_availability ADD COLUMN afternoon_max INTEGER DEFAULT 0").run(); } catch(e) {}
 
 module.exports = db;

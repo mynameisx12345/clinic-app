@@ -1,14 +1,27 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [RouterLink],
+  imports: [FormsModule, RouterLink],
   templateUrl: './welcome.component.html',
   styleUrl: './welcome.component.scss'
 })
 export class WelcomeComponent {
-  constructor(public api: ApiService) {}
+  username = ''; password = ''; error = ''; loading = false; showPw = false;
+  constructor(public api: ApiService, private router: Router) {}
+
+  login() {
+    this.loading = true; this.error = '';
+    this.api.login(this.username, this.password).subscribe({
+      next: res => {
+        this.api.saveAuth(res);
+        this.router.navigate(['/' + res.user.role]);
+      },
+      error: () => { this.error = 'Invalid credentials'; this.loading = false; }
+    });
+  }
 }

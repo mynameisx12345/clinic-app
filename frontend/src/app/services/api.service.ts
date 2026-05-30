@@ -27,6 +27,7 @@ export class ApiService {
   }
 
   getUsers() { return this.http.get<any[]>('/api/auth/users', this.headers); }
+  updateUser(id: number, data: any) { return this.http.put<any>(`/api/auth/users/${id}`, data, this.headers); }
 
   logout() {
     localStorage.removeItem('token');
@@ -48,6 +49,7 @@ export class ApiService {
   // Appointments
   bookAppointment(data: any) { return this.http.post<any>('/api/appointments', data); }
   getAppointments() { return this.http.get<any[]>('/api/appointments', this.headers); }
+  getNotifications() { return this.http.get<any[]>('/api/appointments/notifications', this.headers); }
   getMyAppointments() { return this.http.get<any[]>('/api/appointments/my', this.headers); }
   getDoctorAppointments() { return this.http.get<any[]>('/api/appointments/doctor', this.headers); }
   updateAppointmentStatus(id: number, status: string) { return this.http.patch<any>(`/api/appointments/${id}/status`, { status }, this.headers); }

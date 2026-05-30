@@ -2,3 +2,4 @@ node_modules/
 frontend/dist/
 frontend/.angular/
 backend/clinic.db
+update-expiry.sh

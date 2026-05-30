@@ -1,19 +1,41 @@
-<div class="d-flex">
-  <nav class="sidebar p-3" style="width:220px">
-    <h5 class="text-white mb-4">⚗ Pharmacist</h5>
-    <a routerLink="/pharmacist">Dashboard</a>
-    <a routerLink="/pharmacist/inventory">Inventory</a>
-    <a routerLink="/pharmacist/reports">Reports</a>
-    <hr class="border-secondary">
-    <a href="#" (click)="api.logout()">Logout</a>
+<div class="admin-layout">
+  <nav class="sidebar">
+    <div class="sidebar-brand"><img src="assets/1000054328.webp" alt="Logo"><span>Ballogdajan Medical Clinic</span></div>
+    <a routerLink="/pharmacist" class="active">⊞ Dashboard</a>
+    <a routerLink="/pharmacist/inventory">💊 Inventory</a>
+    <a routerLink="/pharmacist/reports">📊 Reports</a>
+    
   </nav>
-  <div class="flex-grow-1 p-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);min-height:100vh">
-    <h3 class="mb-3" style="color:#1565c0">⊞ Pharmacist Dashboard</h3>
+  <div class="admin-main"><header class="admin-header"><h4>Dashboard</h4><div class="admin-header-actions"><app-pharma-notif-bell></app-pharma-notif-bell><div class="user-info"><span>{{api.user?.username}}</span><button class="btn-logout-sm" (click)="api.logout()">Logout</button></div></div></header><div class="admin-content">
+    
     <div class="row g-3">
       <div class="col-md-3"><div class="card metric-card p-3 text-center" style="border-left:4px solid #0d6efd !important"><h4>{{metrics.total}}</h4><small>⊞ Total Medicines</small></div></div>
-      <div class="col-md-3"><div class="card metric-card p-3 text-center" style="border-left:4px solid #f59e0b !important"><h4>{{metrics.lowStock}}</h4><small>▽ Low Stock</small></div></div>
+      <div class="col-md-3"><div class="card metric-card p-3 text-center" style="border-left:4px solid #f59e0b !important"><h4>{{metrics.lowStock}}</h4><small>▽ Low Stock & Critical</small></div></div>
       <div class="col-md-3"><div class="card metric-card p-3 text-center" style="border-left:4px solid #f97316 !important"><h4>{{metrics.expiringSoon}}</h4><small>⏱ Expiring Soon</small></div></div>
       <div class="col-md-3"><div class="card metric-card p-3 text-center" style="border-left:4px solid #ef4444 !important"><h4>{{metrics.expired}}</h4><small>✗ Expired</small></div></div>
     </div>
+
+    <div class="row g-3 mt-4" style="align-items:stretch">
+      <div class="col-12 col-md-6 d-flex">
+        <div class="card shadow-sm border-0 p-4 w-100" style="min-width:0;overflow:hidden">
+          <h5 class="mb-3">Stock Transactions Over Time</h5>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="btn btn-sm" style="border-radius:50px" *ngFor="let t of txnTypes" [style.background]="activeTypes.includes(t.name)?t.color:'transparent'" [style.border]="'1px solid '+t.color" [style.color]="activeTypes.includes(t.name)?'white':t.color" (click)="toggleType(t.name)">{{t.name}}</button>
+          </div>
+          <canvas baseChart [datasets]="chartData" [labels]="chartLabels" [options]="chartOptions" [type]="'line'"></canvas>
+        </div>
+      </div>
+      <div class="col-12 col-md-6 d-flex">
+        <div class="card shadow-sm border-0 p-4 w-100" style="min-width:0;overflow:hidden">
+          <h5 class="mb-3">Sales by Medicine</h5>
+          <div class="d-flex flex-wrap gap-2 align-items-end mb-3">
+            <div><label class="form-label mb-0 small">From</label><input type="date" class="form-control form-control-sm" [(ngModel)]="dateFrom" (ngModelChange)="buildSalesChart()"></div>
+            <div><label class="form-label mb-0 small">To</label><input type="date" class="form-control form-control-sm" [(ngModel)]="dateTo" (ngModelChange)="buildSalesChart()"></div>
+          </div>
+          <canvas baseChart [datasets]="salesChartData" [labels]="salesChartLabels" [options]="salesChartOptions" [type]="'bar'"></canvas>
+        </div>
+      </div>
+    </div>
   </div>
+</div>
 </div>

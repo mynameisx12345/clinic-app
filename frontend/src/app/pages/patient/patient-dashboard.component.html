@@ -1,11 +1,15 @@
-<div class="min-vh-100" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%)">
-  <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="mb-0" style="color:#1565c0">⊞ My Dashboard</h2>
+<div class="min-vh-100" style="background: linear-gradient(160deg, #f0f4f8 0%, #e8edf5 100%)">
+  <header style="background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.05);padding:0.8rem 2rem;position:sticky;top:0;z-index:100">
+    <div class="container d-flex justify-content-between align-items-center">
       <div class="d-flex align-items-center gap-2">
-        <a routerLink="/book" class="btn btn-primary d-none d-md-inline-block" style="border-radius:50px">Book New Appointment</a>
+        <img src="assets/1000054328.webp" alt="Logo" style="height:36px">
+        <span style="font-weight:700;color:#1a1a2e;font-size:0.9rem">Ballogdajan Medical Clinic</span>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <a routerLink="/book" class="btn btn-sm d-none d-md-inline-block" style="border-radius:50px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;padding:0.4rem 1.2rem;font-weight:600;box-shadow:0 3px 10px rgba(21,101,192,0.2)">+ New Appointment</a>
+        <app-patient-notif-bell (refresh)="ngOnInit()"></app-patient-notif-bell>
         <div class="position-relative">
-          <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:42px;height:42px;font-size:1.2rem" (click)="showMenu=!showMenu">👤</button>
+          <button class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:38px;height:38px;font-size:1.1rem;border-color:#e0e0e0" (click)="showMenu=!showMenu">👤</button>
           @if (showMenu) {
             <div class="position-absolute end-0 mt-1 card shadow border-0 py-2" style="min-width:160px;z-index:1050;border-radius:12px">
               <button class="btn btn-link text-start text-dark text-decoration-none px-3 py-2 w-100" (click)="showMenu=false;showProfile=true">👤 My Profile</button>
@@ -16,23 +20,28 @@
         </div>
       </div>
     </div>
+  </header>
+  <div class="container py-4" style="animation:fadeUp 0.4s ease-out">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="mb-0" style="color:#1a1a2e;font-weight:800;letter-spacing:-0.5px">My Dashboard</h2>
+    </div>
     <div class="d-md-none mb-3">
-      <a routerLink="/book" class="btn btn-primary w-100" style="border-radius:50px">Book New Appointment</a>
+      <a routerLink="/book" class="btn w-100" style="border-radius:50px;background:linear-gradient(135deg,#1565c0,#0d47a1);color:#fff;font-weight:600">+ New Appointment</a>
     </div>
 
     <div class="row g-3 mb-4">
       <div class="col-md-4">
-        <div class="card shadow-sm border-0 metric-card p-3 text-center" style="border-left:4px solid #f59e0b !important" [class.active]="filter==='Pending'" (click)="filter='Pending'">
+        <div class="card shadow-sm border-0 metric-card p-3 text-center" style="border-left:4px solid #f59e0b !important;border-radius:14px" [class.active]="filter==='Pending'" (click)="filter='Pending'">
           <h4 class="text-warning">{{counts.Pending}}</h4><small>⟐ Pending</small>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card shadow-sm border-0 metric-card p-3 text-center" style="border-left:4px solid #0d6efd !important" [class.active]="filter==='Confirmed'" (click)="filter='Confirmed'">
+        <div class="card shadow-sm border-0 metric-card p-3 text-center" style="border-left:4px solid #1565c0 !important;border-radius:14px" [class.active]="filter==='Confirmed'" (click)="filter='Confirmed'">
           <h4 class="text-primary">{{counts.Confirmed}}</h4><small>✓ Confirmed</small>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="card shadow-sm border-0 metric-card p-3 text-center" style="border-left:4px solid #22c55e !important" [class.active]="filter==='Completed'" (click)="filter='Completed'">
+        <div class="card shadow-sm border-0 metric-card p-3 text-center" style="border-left:4px solid #22c55e !important;border-radius:14px" [class.active]="filter==='Completed'" (click)="filter='Completed'">
           <h4 class="text-success">{{counts.Completed}}</h4><small>★ Completed</small>
         </div>
       </div>
@@ -44,7 +53,7 @@
         <tbody>
           @for (a of paged; track a.id) {
             <tr>
-              <td>{{a.appointment_date}}</td><td>{{a.time_slot}}</td><td><span class="text-truncate-reason" title="{{a.reason_for_visit}}">{{a.reason_for_visit}}</span></td>
+              <td>{{a.appointment_date}}</td><td>{{a.session_time || a.time_slot}}</td><td><span class="text-truncate-reason" title="{{a.reason_for_visit}}">{{a.reason_for_visit}}</span></td>
               <td><span class="badge" [class.bg-warning]="a.status==='Pending'" [class.bg-primary]="a.status==='Confirmed'" [class.bg-success]="a.status==='Completed'" [class.bg-danger]="a.status==='Cancelled'">{{a.status}}</span></td>
               <td>
                 @if (a.status==='Completed') {

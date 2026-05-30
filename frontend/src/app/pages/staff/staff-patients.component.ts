@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ApiService } from '../../services/api.service';
+import { NotifBellComponent } from '../../shared/notif-bell.component';
 
 @Component({
   selector: 'app-staff-patients',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, NotifBellComponent],
   templateUrl: './staff-patients.component.html',
   styleUrl: './staff-patients.component.scss'
 })
@@ -30,4 +31,23 @@ export class StaffPatientsComponent implements OnInit {
 
   get paged() { return this.filtered.slice((this.page-1)*this.pageSize, this.page*this.pageSize); }
   get totalItems() { return this.filtered.length; }
+
+  printing = false;
+  get printDate() { return new Date().toLocaleDateString(); }
+
+  printTable() {
+    this.printing = true;
+    setTimeout(() => { window.print(); this.printing = false; });
+  }
+
+  exportCsv() {
+    const rows = this.filtered;
+    const header = 'Name,Gender,Contact,Email,Registered';
+    const csv = [header, ...rows.map(p => `"${p.first_name} ${p.last_name}",${p.gender},${p.contact_number},${p.email},${p.is_registered ? 'Yes' : 'No'}`)].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'patients.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }
 }

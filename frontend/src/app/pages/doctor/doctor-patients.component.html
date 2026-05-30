@@ -1,15 +1,18 @@
-<div class="d-flex">
-  <nav class="sidebar p-3" style="width:220px">
-    <h5 class="text-white mb-4">⚕ Doctor Panel</h5>
-    <a routerLink="/doctor">Dashboard</a>
-    <a routerLink="/doctor/appointments">Appointments</a>
-    <a routerLink="/doctor/patients" class="active">Patients</a>
-      <hr class="border-secondary">
-        <a href="#" (click)="api.logout()">Logout</a>
+<div class="admin-layout">
+  <nav class="sidebar">
+    <div class="sidebar-brand"><img src="assets/1000054328.webp" alt="Logo"><span>Ballogdajan Medical Clinic</span></div>
+    <a routerLink="/doctor">⊞ Dashboard</a>
+    <a routerLink="/doctor/appointments">📋 Appointments</a>
+    <a routerLink="/doctor/patients" class="active">👥 Patients</a>
+      
       </nav>
-  <div class="flex-grow-1 p-4" style="background: linear-gradient(135deg, #e3f2fd 0%, #f5f7fa 100%);min-height:100vh">
-    <h3 class="mb-3" style="color:#1565c0">⚇ Patients Directory</h3>
+  <div class="admin-main"><header class="admin-header"><h4>Patients</h4><div class="admin-header-actions"><button class="btn btn-sm btn-outline-primary" style="border-radius:50px" (click)="printTable()">🖨 Print</button><button class="btn btn-sm btn-outline-success" style="border-radius:50px" (click)="exportCsv()">⬇ Export CSV</button><app-notif-bell></app-notif-bell><div class="user-info"><span>{{api.user?.username}}</span><button class="btn-logout-sm" (click)="api.logout()">Logout</button></div></div></header><div class="admin-content">
+    
     <div class="card shadow-sm border-0 p-4 mb-3">
+      <div class="print-header" style="display:none;text-align:center;margin-bottom:16px">
+        <h5 style="margin:0">Ballogdajan Medical Clinic</h5>
+        <small>Patient List — Printed: {{printDate}}</small>
+      </div>
       <div class="d-flex flex-wrap gap-2 mb-3">
         <input class="form-control form-control-sm" style="max-width:250px" placeholder="Search name or contact..." [(ngModel)]="search" (ngModelChange)="page=1" name="search">
         <select class="form-select form-select-sm" style="width:auto" [(ngModel)]="genderFilter" (ngModelChange)="page=1" name="gf"><option value="">All Genders</option><option value="Male">Male</option><option value="Female">Female</option></select>
@@ -17,7 +20,7 @@
       <div class="table-responsive"><table class="table table-hover bg-white">
         <thead><tr><th (click)="sort('first_name')">Name</th><th (click)="sort('gender')">Gender</th><th (click)="sort('age')">Age</th><th (click)="sort('contact_number')">Contact</th><th>Actions</th></tr></thead>
         <tbody>
-          @for (p of paged; track p.id) {
+          @for (p of (printing ? filtered : paged); track p.id) {
             <tr>
               <td>{{p.first_name}} {{p.last_name}}</td><td>{{p.gender}}</td><td>{{p.age}}</td><td>{{p.contact_number}}</td>
               <td><a [routerLink]="'/doctor/patients/'+p.id" class="btn btn-sm btn-info" style="border-radius:50px">View</a></td>
@@ -28,4 +31,5 @@
       <div class="d-flex flex-wrap justify-content-between align-items-center mt-3"><div class="d-flex align-items-center gap-2"><small class="text-muted">Rows per page:</small><select class="form-select form-select-sm" style="width:auto" [ngModel]="pageSize" (ngModelChange)="pageSize=$event;page=1" name="ps"><option [value]="10">10</option><option [value]="20">20</option><option [value]="50">50</option><option [value]="100">100</option></select></div><div class="d-flex align-items-center gap-2"><small class="text-muted">{{(page-1)*pageSize+1}}–{{page*pageSize > totalItems ? totalItems : page*pageSize}} of {{totalItems}}</small><button class="btn btn-sm btn-outline-secondary" [disabled]="page===1" (click)="page=page-1">‹</button><button class="btn btn-sm btn-outline-secondary" [disabled]="page*pageSize>=totalItems" (click)="page=page+1">›</button></div></div>
     </div>
   </div>
+</div>
 </div>
